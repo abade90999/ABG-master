@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABG Interpreter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        input, button {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>ABG Interpreter</h1>
+    <form id="abgForm">
+        <label for="ph">pH:</label>
+        <input type="number" step="0.01" id="ph" required>
+        <br>
+        <label for="co2">CO2 (mmHg):</label>
+        <input type="number" id="co2" required>
+        <br>
+        <label for="hco3">HCO3 (mEq/L):</label>
+        <input type="number" id="hco3" required>
+        <br>
+        <label for="sodium">Sodium (mEq/L):</label>
+        <input type="number" id="sodium" required>
+        <br>
+        <label for="potassium">Potassium (mEq/L):</label>
+        <input type="number" id="potassium" required>
+        <br>
+        <label for="chloride">Chloride (mEq/L):</label>
+        <input type="number" id="chloride" required>
+        <br>
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        function interpretABG(ph, co2, hco3) {
+            if (ph < 7.35) {
+                if (co2 > 45) {
+                    return "Respiratory Acidosis";
+                } else if (hco3 < 22) {
+                    return "Metabolic Acidosis";
+                }
+            } else if (ph > 7.45) {
+                if (co2 < 35) {
+                    return "Respiratory Alkalosis";
+                } else if (hco3 > 26) {
+                    return "Metabolic Alkalosis";
+                }
+            }
+            return "Normal";
+        }
+
+        document.getElementById('abgForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const ph = parseFloat(document.getElementById('ph').value);
+            const co2 = parseFloat(document.getElementById('co2').value);
+            const hco3 = parseFloat(document.getElementById('hco3').value);
+            const sodium = parseFloat(document.getElementById('sodium').value);
+            const potassium = parseFloat(document.getElementById('potassium').value);
+            const chloride = parseFloat(document.getElementById('chloride').value);
+
+            const anionGap = sodium - (chloride + hco3);
+            const deltaAnionGap = anionGap - 12;
+            const interpretation = interpretABG(ph, co2, hco3);
+
+            document.getElementById('results').innerHTML = `
+                <p>Interpretation: ${interpretation}</p>
+                <p>Anion Gap: ${anionGap.toFixed(2)}</p>
+                <p>Delta Anion Gap: ${deltaAnionGap.toFixed(2)}</p>
+                <p>Top Differential Diagnoses: [To be determined by a medical professional]</p>
+                <p>Other Possible Differential Diagnoses: [To be determined by a medical professional]</p>
+            `;
+        });
+    </script>
+</body>
+</html>
